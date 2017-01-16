@@ -70,6 +70,10 @@ func ListAPIs(size int, offset string) (*models.APIList, error) {
 // upstream_url	The base target URL that points to your API server, this URL will be used for proxying requests. For example, https://mockbin.com.
 func UpdateAPI(nameOrID string, api *models.API) (*models.API, error) {
 	//PATCH /apis/{name or id}
+	if len(nameOrID) == 0 {
+		return nil, errors.New("The unique identifier or the name of the API can not be null")
+	}
+
 	jsonStr, err := json.Marshal(api)
 	url := kongAdminURL + `/apis/` + nameOrID
 	req, _ := http.NewRequest("PATCH", url, bytes.NewBuffer(jsonStr))
@@ -92,7 +96,7 @@ func UpdateAPI(nameOrID string, api *models.API) (*models.API, error) {
 //DeleteAPI Delete API
 func DeleteAPI(nameOrID string) error {
 	//DELETE /apis/{name or id}
-	//GET /apis/{name or id}
+
 	if len(nameOrID) == 0 {
 		return errors.New("The unique identifier or the name of the API can not be null")
 	}
