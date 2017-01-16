@@ -1,0 +1,57 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "beego Test API",
+        "description": "beego has a very cool tools to autogenerate documents for your API",
+        "version": "1.0.0",
+        "termsOfService": "http://beego.me/",
+        "contact": {
+            "email": "astaxie@gmail.com"
+        },
+        "license": {
+            "name": "Url http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "basePath": "serviceFind/v1",
+    "paths": {
+        "/plugin/": {
+            "get": {
+                "tags": [
+                    "plugin"
+                ],
+                "description": "获取KONG所有插件列表"
+            }
+        },
+        "/plugin/add": {
+            "post": {
+                "tags": [
+                    "plugin"
+                ],
+                "description": "新增一个插件",
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "pluginId",
+                        "description": "插件ID",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "pluginName",
+                        "description": "插件名称",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "pluginDesc",
+                        "description": "插件描述",
+                        "required": true,
+                        "type": "string"
+                    }
+                ]
+            }
+        }
+    }
+}
