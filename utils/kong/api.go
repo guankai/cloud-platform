@@ -1,6 +1,16 @@
 package kong
 
-import "service-cloud/utils/kong/models"
+import (
+	"bytes"
+	"errors"
+	"net/http"
+	"service-cloud/utils/kong/models"
+	"strconv"
+
+	"encoding/json"
+
+	"github.com/astaxie/beego/httplib"
+)
 
 // AddAPI Add API
 // name -- optional	The API name. If none is specified, will default to the request_host or request_path.
@@ -11,16 +21,37 @@ import "service-cloud/utils/kong/models"
 // upstream_url	The base target URL that points to your API server, this URL will be used for proxying requests. For example, https://mockbin.com.
 func AddAPI(api *models.API) (*models.API, error) {
 	// POST /apis/
+	req := httplib.Post(kongAdminURL + `/apis/`)
+	req.Param("name", api.Name)
+	req.Param("request_host", api.RequestHost)
+	req.Param("request_path", api.RequestPath)
+	req.Param("strip_request_path", strconv.FormatBool(api.StripRequestPath))
+	req.Param("preserve_host", strconv.FormatBool(api.PreserveHost))
+	req.Param("upstream_url", api.UpstreamURL)
 
-	return nil, nil
+	var retAPI models.API
+	err := req.ToJSON(&retAPI)
+	if err != nil {
+		return nil, err
+	}
+	return &retAPI, nil
 }
 
 // GetAPI Retrieve API
 // nameOrID -- (required)The unique identifier or the name of the API to retrieve.
 func GetAPI(nameOrID string) (*models.API, error) {
 	//GET /apis/{name or id}
+	if len(nameOrID) == 0 {
+		return nil, errors.New("The unique identifier or the name of the API can not be null")
+	}
+	req := httplib.Get(kongAdminURL + `/apis/` + nameOrID)
 
-	return nil, nil
+	var retAPI models.API
+	err := req.ToJSON(&retAPI)
+	if err != nil {
+		return nil, err
+	}
+	return &retAPI, nil
 }
 
 //ListAPIs List APIs
@@ -39,13 +70,37 @@ func ListAPIs(size int, offset string) (*models.APIList, error) {
 // upstream_url	The base target URL that points to your API server, this URL will be used for proxying requests. For example, https://mockbin.com.
 func UpdateAPI(nameOrID string, api *models.API) (*models.API, error) {
 	//PATCH /apis/{name or id}
+	jsonStr, err := json.Marshal(api)
+	url := kongAdminURL + `/apis/` + nameOrID
+	req, _ := http.NewRequest("PATCH", url, bytes.NewBuffer(jsonStr))
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
 
-	return nil, nil
+	var retAPI models.API
+	err = json.NewDecoder(resp.Body).Decode(&retAPI)
+	if err != nil {
+		return nil, err
+	}
+
+	return &retAPI, nil
 }
 
 //DeleteAPI Delete API
 func DeleteAPI(nameOrID string) error {
 	//DELETE /apis/{name or id}
+	//GET /apis/{name or id}
+	if len(nameOrID) == 0 {
+		return errors.New("The unique identifier or the name of the API can not be null")
+	}
+	req := httplib.Delete(kongAdminURL + `/apis/` + nameOrID)
 
+	_, err := req.Response()
+	if err != nil {
+		return err
+	}
 	return nil
 }
