@@ -18,7 +18,8 @@ type API struct {
 
 //APIList find all apis by page
 type APIList struct {
-	Total int    `json:"total"` // total count of apis
-	Data  []API  `json:"data"`  // apis
-	Next  string `json:"next"`  // next page url
+	Total  int    `json:"total"` // total count of apis
+	Data   []API  `json:"data"`  // apis
+	Next   string `json:"next"`  // next page url
+	Offset string `json:"offset"`
 }

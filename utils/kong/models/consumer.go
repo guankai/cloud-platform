@@ -12,7 +12,8 @@ type Consumer struct {
 
 //ConsumerList find all Consumers by page
 type ConsumerList struct {
-	Total int        `json:"total"` // total count of apis
-	Data  []Consumer `json:"data"`  // apis
-	Next  string     `json:"next"`  // next page url
+	Total  int        `json:"total"` // total count of apis
+	Data   []Consumer `json:"data"`  // apis
+	Next   string     `json:"next"`  // next page url
+	Offset string     `json:"offset"`
 }

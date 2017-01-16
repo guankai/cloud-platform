@@ -26,7 +26,15 @@ type ApiKey struct {
 
 //KeyAuthPluginList find all apis by page
 type KeyAuthPluginList struct {
-	Total int             `json:"total"` // total count of apis
-	Data  []KeyAuthPlugin `json:"data"`  // apis
-	Next  string          `json:"next"`  // next page url
+	Total  int             `json:"total"` // total count of apis
+	Data   []KeyAuthPlugin `json:"data"`  // apis
+	Next   string          `json:"next"`  // next page url
+	Offset string          `json:"offset"`
+}
+
+type ApiKeyList struct {
+	Total  int      `json:"total"` // total count of apis
+	Data   []ApiKey `json:"data"`  // apis
+	Next   string   `json:"next"`  // next page url
+	Offset string   `json:"offset"`
 }
