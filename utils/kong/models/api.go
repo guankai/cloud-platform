@@ -6,12 +6,12 @@ import (
 
 //API is api model of kong
 type API struct {
-	ID               string    `json:"ip"`
+	ID               string    `json:"id"`
 	Name             string    `json:"name"`               //"Mockbin",
 	RequestHost      string    `json:"request_host"`       //"mockbin.com",
 	RequestPath      string    `json:"request_path"`       //"/someservice",
-	StripRequestPath string    `json:"strip_request_path"` //false,
-	PreserveHost     string    `json:"preserve_host"`      //false,
+	StripRequestPath bool      `json:"strip_request_path"` //false,
+	PreserveHost     bool      `json:"preserve_host"`      //false,
 	UpstreamURL      string    `json:"upstream_url"`       //"https://mockbin.com"
 	CreateAt         time.Time `json:"created_at"`
 }

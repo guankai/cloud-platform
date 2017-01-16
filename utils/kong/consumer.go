@@ -19,7 +19,7 @@ func GetConsumer(nameOrID string) (*models.Consumer, error) {
 }
 
 //ListConsumers List Consumers
-func ListConsumers() ([]models.Consumer, error) {
+func ListConsumers(size int, offset string) (*models.ConsumerList, error) {
 	//GET /consumers/
 	return nil, nil
 }
