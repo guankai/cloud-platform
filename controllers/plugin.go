@@ -39,3 +39,16 @@ func (this *PluginController) AddPlugin() {
 	this.Data["json"] = "新增插件成功"
 	this.ServeJSON()
 }
+// @Description 删除一个插件
+// @Param pluginId path string true "待删除的pluginId"
+// @router /del/:pluginId [delete]
+func (this *PluginController) DeletePlugin() {
+	pluginId := this.GetString(":pluginId")
+	err := models.DeletePlugin(pluginId)
+	if err != nil {
+		logs.Error("删除插件失败%v", err)
+		this.CustomAbort(http.StatusInternalServerError, "删除插件失败")
+	}
+	this.Data["json"] = "删除插件成功"
+	this.ServeJSON()
+}

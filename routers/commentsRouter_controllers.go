@@ -20,4 +20,11 @@ func init() {
 			AllowHTTPMethods: []string{"post"},
 			Params: nil})
 
+	beego.GlobalControllerRouter["service-cloud/controllers:PluginController"] = append(beego.GlobalControllerRouter["service-cloud/controllers:PluginController"],
+		beego.ControllerComments{
+			Method: "DeletePlugin",
+			Router: `/del/:pluginId`,
+			AllowHTTPMethods: []string{"delete"},
+			Params: nil})
+
 }
