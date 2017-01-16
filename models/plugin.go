@@ -27,6 +27,16 @@ func GetPlugin(pluginId string) (*ClPlugin, error) {
 	}
 	return &plugin, nil
 }
+//获取插件by插件名称
+func GetPluginByName(pluginName string) (*ClPlugin, error) {
+	o := db.GetOrmer()
+	var plugin ClPlugin
+	err := o.QueryTable("cl_plugin").Filter("plugin_name", pluginName).One(&plugin)
+	if err != nil {
+		return nil, err
+	}
+	return &plugin, nil
+}
 //insert插件
 func InsertPlugin(plugin *ClPlugin) error {
 	o := db.GetOrmer()
