@@ -25,7 +25,9 @@ func ListConsumers(size int, offset string) (*models.ConsumerList, error) {
 }
 
 //UpdateConsumer Update Consumer
-func UpdateConsumer(nameOrID string) (*models.Consumer, error) {
+//usernameOrID -- (required)The unique identifier or the username of the consumer to update
+// consumer -- new information
+func UpdateConsumer(usernameOrID string, consumer *models.Consumer) (*models.Consumer, error) {
 	//PATCH /Consumers/{name or id}
 
 	return nil, nil
