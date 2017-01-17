@@ -57,7 +57,20 @@ func GetAPI(nameOrID string) (*models.API, error) {
 //ListAPIs List APIs
 func ListAPIs(size int, offset string) (*models.APIList, error) {
 	//GET /apis/
-	return nil, nil
+
+	req := httplib.Get(kongAdminURL + `/apis/`)
+	if size > 0 {
+		req.Param("size", string(size))
+	}
+	if len(offset) > 0 {
+		req.Param("offset", offset)
+	}
+	var retAPIList models.APIList
+	err := req.ToJSON(&retAPIList)
+	if err != nil {
+		return nil, err
+	}
+	return &retAPIList, nil
 }
 
 // UpdateAPI Update API

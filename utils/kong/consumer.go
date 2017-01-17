@@ -46,8 +46,19 @@ func GetConsumer(nameOrID string) (*models.Consumer, error) {
 //ListConsumers List Consumers
 func ListConsumers(size int, offset string) (*models.ConsumerList, error) {
 	// GET /consumers/
-	// TODO
-	return nil, nil
+	req := httplib.Get(kongAdminURL + `/consumers/`)
+	if size > 0 {
+		req.Param("size", string(size))
+	}
+	if len(offset) > 0 {
+		req.Param("offset", offset)
+	}
+	var retConsumerList models.ConsumerList
+	err := req.ToJSON(&retConsumerList)
+	if err != nil {
+		return nil, err
+	}
+	return &retConsumerList, nil
 }
 
 // UpdateConsumer Update Consumer
