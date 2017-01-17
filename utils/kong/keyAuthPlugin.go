@@ -123,7 +123,6 @@ func ListKeyAuthPluginPerApi(plugin models.KeyAuthPlugin, size int, offset strin
 // id -- required	The unique identifier of the plugin configuration to delete on this API
 func DeleteKeyAuthPluginPerApi(id string, apiNameOrId string) error {
 	//DELETE /apis/{api name or id}/plugins/{id}
-
 	if len(apiNameOrId) == 0 {
 		return errors.New("The unique identifier or the name of the API can not be null")
 	}

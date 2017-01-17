@@ -3,6 +3,7 @@ package kong
 import (
 	"bytes"
 	"errors"
+	"log"
 	"net/http"
 	"net/url"
 	"service-cloud/utils/kong/models"
@@ -23,6 +24,7 @@ import (
 func AddAPI(api *models.API) (*models.API, error) {
 	// POST /apis/
 	req := httplib.Post(kongAdminURL + `/apis/`)
+	log.Println("kongAdminURL", kongAdminURL)
 	req.Param("name", api.Name)
 	req.Param("request_host", api.RequestHost)
 	req.Param("request_path", api.RequestPath)

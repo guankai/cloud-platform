@@ -1,7 +1,5 @@
 package models
 
-import "time"
-
 type KeyAuthPlugin struct {
 	ID         string        `json:"id" url:"id,omitempty"`                   //: "4d924084-1adb-40a5-c042-63b19db421d1",
 	ApiId      string        `json:"api_id" url:"api_id,omitempty"`           //: "5fd1z584-1adb-40a5-c042-63b19db49x21",
@@ -9,7 +7,7 @@ type KeyAuthPlugin struct {
 	Name       string        `json:"name" url:"name,omitempty"`               //: "rate-limiting",
 	Config     KeyAuthConfig `json:"config" url:"-"`                          //:///
 	Enabled    bool          `json:"enabled" url:"-"`                         //: true,
-	CreatedAt  time.Time     `json:"created_at" url:"-"`                      //: 1422386534
+	CreatedAt  KongTime      `json:"created_at" url:"-"`                      //: 1422386534
 }
 
 type KeyAuthConfig struct {
@@ -18,10 +16,10 @@ type KeyAuthConfig struct {
 }
 
 type ApiKey struct {
-	Key        string    `json:"key"`         //: "1234567890",
-	ConsumerId string    `json:"consumer_id"` //: "5878ca3a-13a8-4cee-8ac9-de2cdb588381",
-	CreatedAt  time.Time `json:"created_at"`  //: 1484278640000,
-	ID         string    `json:"id"`          //: "88ca1d4a-cc29-4856-98e2-36c08afbf698"
+	Key        string   `json:"key"`         //: "1234567890",
+	ConsumerId string   `json:"consumer_id"` //: "5878ca3a-13a8-4cee-8ac9-de2cdb588381",
+	CreatedAt  KongTime `json:"created_at"`  //: 1484278640000,
+	ID         string   `json:"id"`          //: "88ca1d4a-cc29-4856-98e2-36c08afbf698"
 }
 
 //KeyAuthPluginList find all apis by page
