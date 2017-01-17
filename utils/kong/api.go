@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"net/http"
+	"net/url"
 	"service-cloud/utils/kong/models"
 	"strconv"
 
@@ -57,16 +58,22 @@ func GetAPI(nameOrID string) (*models.API, error) {
 //ListAPIs List APIs
 func ListAPIs(size int, offset string) (*models.APIList, error) {
 	//GET /apis/
-
-	req := httplib.Get(kongAdminURL + `/apis/`)
+	u, err := url.Parse(kongAdminURL + `/apis/`)
+	if err != nil {
+		return nil, err
+	}
+	urlValues := u.Query()
 	if size > 0 {
-		req.Param("size", string(size))
+		urlValues.Add("size", strconv.Itoa(size))
 	}
 	if len(offset) > 0 {
-		req.Param("offset", offset)
+		urlValues.Add("offset", offset)
 	}
+	u.RawQuery = urlValues.Encode()
+	req := httplib.Get(u.String())
+
 	var retAPIList models.APIList
-	err := req.ToJSON(&retAPIList)
+	err = req.ToJSON(&retAPIList)
 	if err != nil {
 		return nil, err
 	}

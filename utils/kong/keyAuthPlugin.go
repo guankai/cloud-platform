@@ -2,7 +2,9 @@ package kong
 
 import (
 	"errors"
+	"net/url"
 	"service-cloud/utils/kong/models"
+	"strconv"
 
 	"github.com/astaxie/beego/httplib"
 )
@@ -119,15 +121,23 @@ func ListAPIKey(consumerNameOrId string, size int, offset string) (*models.ApiKe
 	if len(consumerNameOrId) == 0 {
 		return nil, errors.New("The unique identifier or the name of the consumer can not be null")
 	}
-	req := httplib.Get(kongAdminURL + `/consumers/` + consumerNameOrId + `/key-auth`)
+	//do get
+	u, err := url.Parse(kongAdminURL + `/consumers/` + consumerNameOrId + `/key-auth`)
+	if err != nil {
+		return nil, err
+	}
+	urlValues := u.Query()
 	if size > 0 {
-		req.Param("size", string(size))
+		urlValues.Add("size", strconv.Itoa(size))
 	}
 	if len(offset) > 0 {
-		req.Param("offset", offset)
+		urlValues.Add("offset", offset)
 	}
+	u.RawQuery = urlValues.Encode()
+	req := httplib.Get(u.String())
+	//to json
 	var retApiKeyList models.ApiKeyList
-	err := req.ToJSON(&retApiKeyList)
+	err = req.ToJSON(&retApiKeyList)
 	if err != nil {
 		return nil, err
 	}

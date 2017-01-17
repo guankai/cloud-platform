@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/url"
 	"service-cloud/utils/kong/models"
+	"strconv"
 
 	"github.com/astaxie/beego/httplib"
 )
@@ -46,15 +48,21 @@ func GetConsumer(nameOrID string) (*models.Consumer, error) {
 //ListConsumers List Consumers
 func ListConsumers(size int, offset string) (*models.ConsumerList, error) {
 	// GET /consumers/
-	req := httplib.Get(kongAdminURL + `/consumers/`)
+	u, err := url.Parse(kongAdminURL + `/consumers/`)
+	if err != nil {
+		return nil, err
+	}
+	urlValues := u.Query()
 	if size > 0 {
-		req.Param("size", string(size))
+		urlValues.Add("size", strconv.Itoa(size))
 	}
 	if len(offset) > 0 {
-		req.Param("offset", offset)
+		urlValues.Add("offset", offset)
 	}
+	u.RawQuery = urlValues.Encode()
+	req := httplib.Get(u.String())
 	var retConsumerList models.ConsumerList
-	err := req.ToJSON(&retConsumerList)
+	err = req.ToJSON(&retConsumerList)
 	if err != nil {
 		return nil, err
 	}
