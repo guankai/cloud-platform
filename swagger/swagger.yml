@@ -36,3 +36,14 @@ paths:
         description: 插件描述
         required: true
         type: string
+  /plugin/del/{pluginId}:
+    delete:
+      tags:
+      - plugin
+      description: 删除一个插件
+      parameters:
+      - in: path
+        name: pluginId
+        description: 待删除的pluginId
+        required: true
+        type: string

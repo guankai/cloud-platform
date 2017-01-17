@@ -45,7 +45,10 @@ func GetServiceList(queryJson *QueryCon) ([]ClService, int, error) {
 	} else {
 		cond = cond.And("service_name__contains", queryJson.Keyword)
 	}
-	qs := o.QueryTable("cl_service").SetCond(cond)
+	qs := o.QueryTable("cl_service")
+	if cond != nil {
+		qs = qs.SetCond(cond)
+	}
 	qs = qs.OrderBy("-create_time")
 
 	_, err := qs.Limit(queryJson.Limit, queryJson.Offset).All(&serviceList)
@@ -76,4 +79,13 @@ func GetService(serviceId string) (*ClService, error) {
 		return nil, err
 	}
 	return &clService, nil
+}
+//删除服务
+func DelService(serviceId string) error {
+	o := db.GetOrmer()
+	_, err := o.Delete(&ClService{Id:serviceId})
+	if err != nil {
+		return err
+	}
+	return nil
 }

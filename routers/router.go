@@ -20,6 +20,16 @@ func init() {
 				&controllers.PluginController{},
 			),
 		),
+		beego.NSNamespace("/service",
+			beego.NSInclude(
+				&controllers.ServiceController{},
+			),
+		),
+		beego.NSNamespace("/relation",
+			beego.NSInclude(
+				&controllers.RelationController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }
