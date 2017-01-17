@@ -25,6 +25,12 @@ func AddConsumer(consumer *models.Consumer) (*models.Consumer, error) {
 	if err != nil {
 		return nil, err
 	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return nil, errors.New(retStr)
+	}
 	return &retConsumer, nil
 }
 
@@ -41,6 +47,12 @@ func GetConsumer(nameOrID string) (*models.Consumer, error) {
 	err := req.ToJSON(&retConsumer)
 	if err != nil {
 		return nil, err
+	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return nil, errors.New(retStr)
 	}
 	return &retConsumer, nil
 }
@@ -66,6 +78,12 @@ func ListConsumers(size int, offset string) (*models.ConsumerList, error) {
 	if err != nil {
 		return nil, err
 	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return nil, errors.New(retStr)
+	}
 	return &retConsumerList, nil
 }
 
@@ -80,6 +98,7 @@ func UpdateConsumer(usernameOrID string, consumer *models.Consumer) (*models.Con
 	jsonStr, err := json.Marshal(consumer)
 	url := kongAdminURL + `/consumers/` + usernameOrID
 	req, _ := http.NewRequest("PATCH", url, bytes.NewBuffer(jsonStr))
+	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -91,6 +110,9 @@ func UpdateConsumer(usernameOrID string, consumer *models.Consumer) (*models.Con
 	err = json.NewDecoder(resp.Body).Decode(&retConsumer)
 	if err != nil {
 		return nil, err
+	}
+	if resp.StatusCode > 299 {
+		return &retConsumer, errors.New("UpdateAPI error, " + resp.Status)
 	}
 
 	return &retConsumer, nil
@@ -107,6 +129,12 @@ func DeleteConsumer(nameOrID string) error {
 	_, err := req.Response()
 	if err != nil {
 		return err
+	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return errors.New(retStr)
 	}
 	return nil
 }

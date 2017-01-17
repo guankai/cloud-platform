@@ -3,6 +3,7 @@ package kong
 import (
 	"bytes"
 	"errors"
+	"log"
 	"net/http"
 	"net/url"
 	"service-cloud/utils/kong/models"
@@ -23,6 +24,7 @@ import (
 func AddAPI(api *models.API) (*models.API, error) {
 	// POST /apis/
 	req := httplib.Post(kongAdminURL + `/apis/`)
+	log.Println("kongAdminURL", kongAdminURL)
 	req.Param("name", api.Name)
 	req.Param("request_host", api.RequestHost)
 	req.Param("request_path", api.RequestPath)
@@ -35,6 +37,13 @@ func AddAPI(api *models.API) (*models.API, error) {
 	if err != nil {
 		return nil, err
 	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return nil, errors.New(retStr)
+	}
+
 	return &retAPI, nil
 }
 
@@ -51,6 +60,12 @@ func GetAPI(nameOrID string) (*models.API, error) {
 	err := req.ToJSON(&retAPI)
 	if err != nil {
 		return nil, err
+	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return nil, errors.New(retStr)
 	}
 	return &retAPI, nil
 }
@@ -77,6 +92,12 @@ func ListAPIs(size int, offset string) (*models.APIList, error) {
 	if err != nil {
 		return nil, err
 	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return nil, errors.New(retStr)
+	}
 	return &retAPIList, nil
 }
 
@@ -90,6 +111,7 @@ func ListAPIs(size int, offset string) (*models.APIList, error) {
 // upstream_url	The base target URL that points to your API server, this URL will be used for proxying requests. For example, https://mockbin.com.
 func UpdateAPI(nameOrID string, api *models.API) (*models.API, error) {
 	//PATCH /apis/{name or id}
+	//log.Println("Enter UpdateAPI,", nameOrID, *api)
 	if len(nameOrID) == 0 {
 		return nil, errors.New("The unique identifier or the name of the API can not be null")
 	}
@@ -97,6 +119,7 @@ func UpdateAPI(nameOrID string, api *models.API) (*models.API, error) {
 	jsonStr, err := json.Marshal(api)
 	url := kongAdminURL + `/apis/` + nameOrID
 	req, _ := http.NewRequest("PATCH", url, bytes.NewBuffer(jsonStr))
+	req.Header.Set("Content-Type", "application/json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -105,11 +128,15 @@ func UpdateAPI(nameOrID string, api *models.API) (*models.API, error) {
 	defer resp.Body.Close()
 
 	var retAPI models.API
+	// bs, err := ioutil.ReadAll(resp.Body)
+	// log.Println("UpdateAPI body, ", string(bs))
 	err = json.NewDecoder(resp.Body).Decode(&retAPI)
 	if err != nil {
 		return nil, err
 	}
-
+	if resp.StatusCode > 299 {
+		return &retAPI, errors.New("UpdateAPI error, " + resp.Status)
+	}
 	return &retAPI, nil
 }
 
@@ -125,6 +152,12 @@ func DeleteAPI(nameOrID string) error {
 	_, err := req.Response()
 	if err != nil {
 		return err
+	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return errors.New(retStr)
 	}
 	return nil
 }

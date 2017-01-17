@@ -23,6 +23,12 @@ func AddKeyAuthPlugin2Api(apiNameOrId string) (*models.KeyAuthPlugin, error) {
 	if err != nil {
 		return nil, err
 	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return nil, errors.New(retStr)
+	}
 	return &retKeyAuthPlugin, nil
 }
 
@@ -39,6 +45,12 @@ func GetKeyAuthPlugin(id string) (*models.KeyAuthPlugin, error) {
 	err := req.ToJSON(&retKeyAuthPlugin)
 	if err != nil {
 		return nil, err
+	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return nil, errors.New(retStr)
 	}
 	return &retKeyAuthPlugin, nil
 }
@@ -74,6 +86,12 @@ func ListKeyAuthPlugin(plugin models.KeyAuthPlugin, size int, offset string) (*m
 	err = req.ToJSON(&retKeyAuthPluginList)
 	if err != nil {
 		return nil, err
+	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return nil, errors.New(retStr)
 	}
 	return &retKeyAuthPluginList, nil
 }
@@ -113,6 +131,12 @@ func ListKeyAuthPluginPerApi(plugin models.KeyAuthPlugin, size int, offset strin
 	if err != nil {
 		return nil, err
 	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return nil, errors.New(retStr)
+	}
 	return &retKeyAuthPluginList, nil
 }
 
@@ -123,7 +147,6 @@ func ListKeyAuthPluginPerApi(plugin models.KeyAuthPlugin, size int, offset strin
 // id -- required	The unique identifier of the plugin configuration to delete on this API
 func DeleteKeyAuthPluginPerApi(id string, apiNameOrId string) error {
 	//DELETE /apis/{api name or id}/plugins/{id}
-
 	if len(apiNameOrId) == 0 {
 		return errors.New("The unique identifier or the name of the API can not be null")
 	}
@@ -136,6 +159,12 @@ func DeleteKeyAuthPluginPerApi(id string, apiNameOrId string) error {
 	_, err := req.Response()
 	if err != nil {
 		return err
+	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return errors.New(retStr)
 	}
 	return nil
 }
@@ -155,6 +184,12 @@ func CreateAPIKey(consumerNameOrId string, apikey string) (*models.ApiKey, error
 	if err != nil {
 		return nil, err
 	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return nil, errors.New(retStr)
+	}
 	return &retApiKey, nil
 }
 
@@ -171,6 +206,12 @@ func GetAPIKey(consumerNameOrId string, apikeyid string) (*models.ApiKey, error)
 	err := req.ToJSON(&retApiKey)
 	if err != nil {
 		return nil, err
+	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return nil, errors.New(retStr)
 	}
 	return &retApiKey, nil
 }
@@ -202,6 +243,12 @@ func ListAPIKey(consumerNameOrId string, size int, offset string) (*models.ApiKe
 	if err != nil {
 		return nil, err
 	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return nil, errors.New(retStr)
+	}
 	return &retApiKeyList, nil
 }
 
@@ -220,6 +267,12 @@ func DeleteAPIKey(consumerNameOrId string, apikeyid string) error {
 	_, err := req.Response()
 	if err != nil {
 		return err
+	}
+	resp, _ := req.Response()
+	defer resp.Body.Close()
+	if resp.StatusCode > 299 {
+		retStr, _ := req.String()
+		return errors.New(retStr)
 	}
 	return nil
 }
