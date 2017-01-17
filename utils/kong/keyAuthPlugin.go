@@ -95,10 +95,27 @@ func CreateAPIKey(consumerNameOrId string, apikey string) (*models.ApiKey, error
 	return &retApiKey, nil
 }
 
-// CreateAPIKey Create an API Key
+func GetAPIKey(consumerNameOrId string, apikeyid string) (*models.ApiKey, error) {
+	// GET http://13.76.42.81:8001/consumers/guan/key-auth/a0fdba77-fc6d-4632-845c-cc1a623cf59d
+	if len(consumerNameOrId) == 0 {
+		return nil, errors.New("The unique identifier or the name of the consumer can not be null")
+	}
+	if len(apikeyid) == 0 {
+		return nil, errors.New("The unique identifier of the apikey can not be null")
+	}
+	req := httplib.Get(kongAdminURL + `/consumers/` + consumerNameOrId + `/key-auth/` + apikeyid)
+	var retApiKey models.ApiKey
+	err := req.ToJSON(&retApiKey)
+	if err != nil {
+		return nil, err
+	}
+	return &retApiKey, nil
+}
+
+// ListAPIKey Create an API Key
 // consumerNameOrId -- The id or username property of the Consumer entity to associate the credentials to.
-func GetAPIKey(consumerNameOrId string, size int, offset string) (*models.ApiKeyList, error) {
-	//Get http://kong:8001/consumers/{consumerNameOrId}/key-auth -d '' HTTP/1.1 201 Created
+func ListAPIKey(consumerNameOrId string, size int, offset string) (*models.ApiKeyList, error) {
+	//Get http://kong:8001/consumers/{consumerNameOrId}/key-auth?size=1 -d '' HTTP/1.1 201 Created
 	if len(consumerNameOrId) == 0 {
 		return nil, errors.New("The unique identifier or the name of the consumer can not be null")
 	}
