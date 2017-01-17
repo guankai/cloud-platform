@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/astaxie/beego/httplib"
+	urlQuery "github.com/google/go-querystring/query"
 )
 
 // AddKeyAuthPlugin2Api Add Plugin to  a specific API
@@ -51,7 +52,30 @@ func GetKeyAuthPlugin(id string) (*models.KeyAuthPlugin, error) {
 // plugin.offset -- optional	A cursor used for pagination. offset is an object identifier that defines a place in the list.
 func ListKeyAuthPlugin(plugin models.KeyAuthPlugin, size int, offset string) (*models.KeyAuthPluginList, error) {
 	//GET /plugins/
-	return nil, nil
+
+	//do get
+	u, err := url.Parse(kongAdminURL + `/plugins/`)
+	if err != nil {
+		return nil, err
+	}
+	urlValues, _ := urlQuery.Values(plugin)
+	if size > 0 {
+		urlValues.Add("size", strconv.Itoa(size))
+	}
+	if len(offset) > 0 {
+		urlValues.Add("offset", offset)
+	}
+
+	u.RawQuery = urlValues.Encode()
+	req := httplib.Get(u.String())
+
+	//to json
+	var retKeyAuthPluginList models.KeyAuthPluginList
+	err = req.ToJSON(&retKeyAuthPluginList)
+	if err != nil {
+		return nil, err
+	}
+	return &retKeyAuthPluginList, nil
 }
 
 // ListKeyAuthPluginPerApi List All Plugins for specific api
@@ -64,8 +88,32 @@ func ListKeyAuthPlugin(plugin models.KeyAuthPlugin, size int, offset string) (*m
 // apiNameOrId --
 func ListKeyAuthPluginPerApi(plugin models.KeyAuthPlugin, size int, offset string, apiNameOrId string) (*models.KeyAuthPluginList, error) {
 	//GET /apis/{api name or id}/plugins/
+	if len(apiNameOrId) == 0 {
+		return nil, errors.New("The unique identifier or the name of the api can not be null")
+	}
+	//do get
+	u, err := url.Parse(kongAdminURL + `/apis/` + apiNameOrId + `/plugins/`)
+	if err != nil {
+		return nil, err
+	}
+	urlValues, _ := urlQuery.Values(plugin)
+	if size > 0 {
+		urlValues.Add("size", strconv.Itoa(size))
+	}
+	if len(offset) > 0 {
+		urlValues.Add("offset", offset)
+	}
 
-	return nil, nil
+	u.RawQuery = urlValues.Encode()
+	req := httplib.Get(u.String())
+
+	//to json
+	var retKeyAuthPluginList models.KeyAuthPluginList
+	err = req.ToJSON(&retKeyAuthPluginList)
+	if err != nil {
+		return nil, err
+	}
+	return &retKeyAuthPluginList, nil
 }
 
 //TODO update
@@ -74,8 +122,21 @@ func ListKeyAuthPluginPerApi(plugin models.KeyAuthPlugin, size int, offset strin
 // apiNameOrId -- required	The unique identifier or the name of the API for which to delete the plugin configuration
 // id -- required	The unique identifier of the plugin configuration to delete on this API
 func DeleteKeyAuthPluginPerApi(id string, apiNameOrId string) error {
-	//GET /apis/{api name or id}/plugins/
+	//DELETE /apis/{api name or id}/plugins/{id}
 
+	if len(apiNameOrId) == 0 {
+		return errors.New("The unique identifier or the name of the API can not be null")
+	}
+	if len(id) == 0 {
+		return errors.New("The unique identifier of the plugin can not be null")
+	}
+
+	req := httplib.Delete(kongAdminURL + `/apis/` + apiNameOrId + `/plugins/` + id)
+
+	_, err := req.Response()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
