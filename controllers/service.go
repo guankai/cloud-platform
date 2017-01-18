@@ -86,6 +86,7 @@ func (this *ServiceController) AddService() {
 		this.CustomAbort(http.StatusInternalServerError, "服务注册失败")
 	}
 	service.ApiId = apiRet.ID
+	logs.Debug("the api_id is %s", apiRet.ID)
 	//关联对应的plugin
 	plugin, errPlugin := models.GetPluginByName("key-auth")
 	if errPlugin != nil {

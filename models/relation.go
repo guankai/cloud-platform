@@ -83,10 +83,10 @@ func SetStatus(relationId string, status string, apiKey string, apikeyId string)
 // 通过serviceId和用户名查询relationId
 func GetServiceByUser(serviceId string, userName string) (*ClRelation, error) {
 	o := db.GetOrmer()
-	var relation ClRelation
-	err := o.QueryTable("cl_relation").Filter("service_id", serviceId).Filter("userName", userName).RelatedSel().One(&relation)
+	relation := new(ClRelation)
+	err := o.QueryTable("cl_relation").Filter("service_id", serviceId).Filter("userName", userName).RelatedSel().One(relation)
 	if err != nil {
 		return nil, err
 	}
-	return &relation, nil
+	return relation, nil
 }

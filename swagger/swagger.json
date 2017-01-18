@@ -69,6 +69,261 @@
                     }
                 ]
             }
+        },
+        "/relation/query": {
+            "post": {
+                "tags": [
+                    "relation"
+                ],
+                "description": "用户获取所有服务",
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "userName",
+                        "description": "用户名",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "page",
+                        "description": "当前页",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "pageSize",
+                        "description": "每页行数",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                ]
+            }
+        },
+        "/relation/shutdown": {
+            "post": {
+                "tags": [
+                    "relation"
+                ],
+                "description": "关闭服务",
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "userName",
+                        "description": "用户名",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "serviceId",
+                        "description": "服务名",
+                        "required": true,
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "/relation/startup": {
+            "post": {
+                "tags": [
+                    "relation"
+                ],
+                "description": "用户开启服务",
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "userName",
+                        "description": "用户名",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "serviceId",
+                        "description": "服务ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "/service/add": {
+            "post": {
+                "tags": [
+                    "service"
+                ],
+                "description": "注册服务",
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "serviceName",
+                        "description": "服务名称",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "servicePic",
+                        "description": "服务logo",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "requestPath",
+                        "description": "访问路径",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "provider",
+                        "description": "服务提供者",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "version",
+                        "description": "版本",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "serviceDesc",
+                        "description": "服务概述",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "upstreamUrl",
+                        "description": "服务跳转地址",
+                        "required": true,
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "/service/del/{serviceId}": {
+            "post": {
+                "tags": [
+                    "service"
+                ],
+                "description": "删除服务",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "serviceId",
+                        "description": "服务uuid",
+                        "required": true,
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "/service/query": {
+            "post": {
+                "tags": [
+                    "service"
+                ],
+                "description": "\"根据条件查询所有条件列表\"",
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "page",
+                        "description": "当前页",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "pageSize",
+                        "description": "页面显示个数",
+                        "required": true,
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "keyword",
+                        "description": "serviceName关键字,模糊查询",
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "/service/update": {
+            "post": {
+                "tags": [
+                    "service"
+                ],
+                "description": "修改服务",
+                "parameters": [
+                    {
+                        "in": "formData",
+                        "name": "serviceId",
+                        "description": "服务uuid",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "serviceName",
+                        "description": "服务名称",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "servicePic",
+                        "description": "服务logo",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "requestPath",
+                        "description": "访问路径",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "provider",
+                        "description": "服务提供者",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "version",
+                        "description": "版本",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "serviceDesc",
+                        "description": "服务概述",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "formData",
+                        "name": "upstreamUrl",
+                        "description": "服务跳转地址",
+                        "required": true,
+                        "type": "string"
+                    }
+                ]
+            }
         }
     }
 }

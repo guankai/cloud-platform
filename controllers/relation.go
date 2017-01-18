@@ -85,7 +85,7 @@ func (this *RelationController) EnableService() {
 				this.CustomAbort(http.StatusInternalServerError, "生成APIKEY失败")
 			}
 			//更新数据库
-			var relationInsert models.ClRelation
+			relationInsert :=new(models.ClRelation)
 			relationInsert.UserName = userName
 			relationInsert.ApiKey = apiKeyRet.Key
 			relationInsert.ApiKeyId = apiKeyRet.ID
@@ -93,7 +93,7 @@ func (this *RelationController) EnableService() {
 			relationInsert.Service = relation.Service
 			relationInsert.Status = "1"
 			relationInsert.RelationId = uuid.NewV4().String()
-			errRel := models.InsertRelation(&relationInsert)
+			errRel := models.InsertRelation(relationInsert)
 			if errRel != nil {
 				logs.Error("服务开启失败%v", errRel)
 				this.CustomAbort(http.StatusInternalServerError, "服务开启失败")
