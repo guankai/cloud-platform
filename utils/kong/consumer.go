@@ -17,11 +17,16 @@ import (
 func AddConsumer(consumer *models.Consumer) (*models.Consumer, error) {
 	// POST /consumers/
 	req := httplib.Post(kongAdminURL + `/consumers/`)
-	req.Param("username", consumer.Username)
-	req.Param("custom_id", consumer.CustomID)
+	if len(consumer.Username) > 0 {
+		req.Param("username", consumer.Username)
+	}
+	if len(consumer.CustomID) > 0 {
+		req.Param("custom_id", consumer.CustomID)
+	}
 
 	var retConsumer models.Consumer
 	err := req.ToJSON(&retConsumer)
+
 	if err != nil {
 		return nil, err
 	}
