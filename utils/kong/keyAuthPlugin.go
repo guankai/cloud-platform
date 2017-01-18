@@ -177,7 +177,8 @@ func CreateAPIKey(consumerNameOrId string, apikey string) (*models.ApiKey, error
 	if len(consumerNameOrId) == 0 {
 		return nil, errors.New("The unique identifier or the name of the consumer can not be null")
 	}
-	req := httplib.Post(kongAdminURL + `/consumers/` + consumerNameOrId + `/key-auth`)
+	req := httplib.Post(kongAdminURL + `/consumers/` + consumerNameOrId + `/key-auth/`)
+	req.Header("Content-Type", "application/x-www-form-urlencoded")
 	if len(apikey) > 0 {
 		req.Param("key", apikey)
 	}
