@@ -16,7 +16,7 @@ func AddKeyAuthPlugin2Api(apiNameOrId string) (*models.KeyAuthPlugin, error) {
 	if len(apiNameOrId) == 0 {
 		return nil, errors.New("The unique identifier or the name of the api can not be null")
 	}
-	req := httplib.Post(kongAdminURL + `/apis/` + apiNameOrId + `}/plugins`)
+	req := httplib.Post(kongAdminURL + `/apis/` + apiNameOrId + `/plugins`)
 	req.Param("name", "key-auth")
 	var retKeyAuthPlugin models.KeyAuthPlugin
 	err := req.ToJSON(&retKeyAuthPlugin)
