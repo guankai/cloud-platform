@@ -84,13 +84,19 @@ func (this *RelationController) EnableService() {
 				logs.Error("生成APIKEY失败", errKey)
 				this.CustomAbort(http.StatusInternalServerError, "生成APIKEY失败")
 			}
+			//获取service
+			_service, errSer := models.GetService(serviceId)
+			if errSer != nil {
+				logs.Error("获取服务失败%v", errSer)
+				this.CustomAbort(http.StatusInternalServerError, "获取服务失败")
+			}
 			//更新数据库
-			relationInsert :=new(models.ClRelation)
+			relationInsert := new(models.ClRelation)
 			relationInsert.UserName = userName
 			relationInsert.ApiKey = apiKeyRet.Key
 			relationInsert.ApiKeyId = apiKeyRet.ID
 			relationInsert.ConsumerId = consumerRet.ID
-			relationInsert.Service = relation.Service
+			relationInsert.Service = _service
 			relationInsert.Status = "1"
 			relationInsert.RelationId = uuid.NewV4().String()
 			errRel := models.InsertRelation(relationInsert)
@@ -98,7 +104,7 @@ func (this *RelationController) EnableService() {
 				logs.Error("服务开启失败%v", errRel)
 				this.CustomAbort(http.StatusInternalServerError, "服务开启失败")
 			}
-			this.Data["json"] = map[string]string{"msg":"服务开启成功", "apikey":apiKeyRet.Key, "requestPath":SCHEMAURL + relation.Service.RequestPath}
+			this.Data["json"] = map[string]string{"msg":"服务开启成功", "apikey":apiKeyRet.Key, "requestPath":SCHEMAURL + _service.RequestPath}
 		} else {
 			logs.Error("开启服务失败%v", err)
 			this.CustomAbort(http.StatusInternalServerError, "开启服务失败")
