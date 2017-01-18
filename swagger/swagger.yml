@@ -10,6 +10,11 @@ info:
     name: Url http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: serviceFind/v1
 paths:
+  /apptype/:
+    get:
+      tags:
+      - apptype
+      description: 获取所有的AppType
   /plugin/:
     get:
       tags:
@@ -67,6 +72,35 @@ paths:
       - in: formData
         name: pageSize
         description: 每页行数
+        required: true
+        type: integer
+        format: int64
+  /relation/queryByType:
+    post:
+      tags:
+      - relation
+      description: 用户获取所有服务
+      parameters:
+      - in: formData
+        name: userName
+        description: 用户名
+        required: true
+        type: string
+      - in: formData
+        name: page
+        description: 当前页
+        required: true
+        type: integer
+        format: int64
+      - in: formData
+        name: pageSize
+        description: 每页行数
+        required: true
+        type: integer
+        format: int64
+      - in: formData
+        name: typeId
+        description: 应用类型id
         required: true
         type: integer
         format: int64
@@ -143,6 +177,12 @@ paths:
         description: 服务跳转地址
         required: true
         type: string
+      - in: formData
+        name: typeId
+        description: 类型id
+        required: true
+        type: integer
+        format: int64
   /service/del/{serviceId}:
     post:
       tags:

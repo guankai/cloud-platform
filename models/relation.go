@@ -16,27 +16,35 @@ type ClRelation struct {
 }
 
 type UserService struct {
-	Id          string `json:"serviceId"`
-	ServiceName string `json:"serviceName"`
-	ServicePic  string `json:"servicePic"`
-	RequestPath string `json:"requestPath"`
-	ApiId       string `json:"apiId"`
+	ServiceId   string `json:"service_id"`
+	ServiceName string `json:"service_name"`
+	ServicePic  string `json:"service_pic"`
+	RequestPath string `json:"request_path"`
+	ApiId       string `json:"api_id"`
 	Provider    string `json:"provider"`
-	CreateTime  time.Time `json:"createTime"`
+	CreateTime  time.Time `json:"create_time"`
 	Version     string `json:"version"`
-	ServiceDesc string `json:"serviceDesc"`
-	UpstreamUrl string `json:"upstreamUrl"`
+	ServiceDesc string `json:"service_desc"`
+	UpstreamUrl string `json:"upstream_url"`
 	Status      string `json:"status"`
-	RelationId  string `json:"relationId"`
-	ConsumerId  string `json:"consumerId"`
-	ApiKeyId    string `json:"apiKeyId"`
-	ApiKey      string `json:"apikey"`
+	RelationId  string `json:"relation_id"`
+	ConsumerId  string `json:"consumer_id"`
+	ApiKeyId    string `json:"api_key_id"`
+	ApiKey      string `json:"api_key"`
+	TypeName    string `json:"type_name"`
 }
 
 type RelJson struct {
-	UserName string `json:"userame"`
+	UserName string `json:"userName"`
 	Limit    int `json:"limit"`
 	Offset   int `json:"offset"`
+}
+
+type TypeJson struct {
+	UserName string `json:"userName"`
+	Limit    int `json:"limit"`
+	Offset   int `json:"offset"`
+	TypeId   int `json:"typeId"`
 }
 
 // 添加一个用户与服务的关系
@@ -51,17 +59,32 @@ func InsertRelation(relation *ClRelation) error {
 // 获取用户所有的服务(已开启和未开启)
 func GetAllRelations(relJson *RelJson) ([]UserService, int, error) {
 	o := db.GetOrmer()
-	var userService []UserService
+	var userServiceList []UserService
 	var count int
-	_, err := o.Raw(`select a.service_id serviceId,a.service_name serviceName,a.service_pic servicePic,a.request_path requestPath,a.api_id apiId,a.provider provider,a.create_time createTime,a.version version,a.service_desc serviceDesc,a.upstream_url upstreamUrl,ifnull(b.status,'0') status,ifnull(b.relation_id,'') relationId,ifnull(b.consumer_id,'') consumerId,ifnull(b.api_key_id,'') apiKeyId,ifnull(b.api_key,'') apiKey from cl_service a left join cl_relation b on a.service_id = b.service_id and b.user_name = ? order by status limit ?,?`, relJson.UserName, relJson.Offset, relJson.Limit).QueryRows(&userService)
+	_, err := o.Raw(`select a.service_id,a.service_name,a.service_pic,a.request_path,a.api_id,a.provider,a.create_time,a.version,a.service_desc,a.upstream_url,ifnull(b.status,'0') status,ifnull(b.relation_id,'') relation_id,ifnull(b.consumer_id,'') consumer_id,ifnull(b.api_key_id,'') api_key_id,ifnull(b.api_key,'') api_key,c.type_name from cl_service a left join cl_relation b on a.service_id = b.service_id and b.user_name = ? left join cl_type c on a.type_id = c.type_id order by status limit ?,?`, relJson.UserName, relJson.Offset, relJson.Limit).QueryRows(&userServiceList)
 	if err != nil {
 		return nil, -1, err
 	}
-	errCount := o.Raw(`select count(1) from cl_service a left join cl_relation b on a.service_id = b.service_id and b.user_name = ? order by status limit ?,?`, relJson.UserName, relJson.Offset, relJson.Limit).QueryRow(count)
+	errCount := o.Raw(`select count(1) from cl_service a left join cl_relation b on a.service_id = b.service_id and b.user_name = ? left join cl_type c on a.type_id = c.type_id order by status limit ?,?`, relJson.UserName, relJson.Offset, relJson.Limit).QueryRow(&count)
 	if errCount != nil {
 		return nil, -1, errCount
 	}
-	return userService, count, nil
+	return userServiceList, count, nil
+}
+
+func GetAllRelationsByType(typeJson *TypeJson) ([]UserService, int, error) {
+	o := db.GetOrmer()
+	var userServiceList []UserService
+	var count int
+	_, err := o.Raw(`select a.service_id,a.service_name,a.service_pic,a.request_path,a.api_id,a.provider,a.create_time,a.version,a.service_desc,a.upstream_url,ifnull(b.status,'0') status,ifnull(b.relation_id,'') relation_id,ifnull(b.consumer_id,'') consumer_id,ifnull(b.api_key_id,'') api_key_id,ifnull(b.api_key,'') api_key,c.type_name from cl_service a left join cl_relation b on a.service_id = b.service_id and b.user_name = ? left join cl_type c on a.type_id = c.type_id where c.type_id = ? order by status limit ?,?`, typeJson.UserName, typeJson.TypeId, typeJson.Offset, typeJson.Limit).QueryRows(&userServiceList)
+	if err != nil {
+		return nil, -1, err
+	}
+	errCount := o.Raw(`select count(1) from cl_service a left join cl_relation b on a.service_id = b.service_id and b.user_name = ? left join cl_type c on a.type_id = c.type_id where c.type_id = ? order by status limit ?,?`, typeJson.UserName, typeJson.TypeId,typeJson.Offset, typeJson.Limit).QueryRow(&count)
+	if errCount != nil {
+		return nil, -1, errCount
+	}
+	return userServiceList, count, nil
 }
 // 设置用户服务状态
 func SetStatus(relationId string, status string, apiKey string, apikeyId string) (error) {

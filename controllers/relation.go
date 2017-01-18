@@ -18,7 +18,14 @@ type RelationController struct {
 }
 
 type UserServiceRet struct {
-	UserServices interface{} `json:"userServices"`
+	TypeId       int `json:"typeId"`
+	TypeName     string `json:"typeName"`
+	UserServices []models.UserService `json:"userServices"`
+	PageInfo     *pagination.Paginator `json:"pageInfo"`
+}
+
+type TypeServiceRet struct {
+	UserServices []models.UserService `json:"userServices"`
 	PageInfo     *pagination.Paginator `json:"pageInfo"`
 }
 
@@ -32,24 +39,68 @@ func (this *RelationController) GetServiceList() {
 	userName := this.GetString("userName")
 	page, _ := this.GetInt("page")
 	pageSize, _ := this.GetInt("pageSize")
-	var query models.RelJson
+	//获取所有的appType
+	appTypes, errApp := models.GetAppTypes()
+	if errApp != nil {
+		logs.Error("获取应用类型失败%v", errApp)
+		this.CustomAbort(http.StatusInternalServerError, "获取应用类型失败")
+	}
+	var typeServices []UserServiceRet
+	for _, appType := range appTypes {
+		var query models.TypeJson
+		_page := pagination.NewPaginator(page, pageSize)
+		query.UserName = userName
+		query.Limit = pageSize
+		query.Offset = _page.Offset()
+		query.TypeId = appType.Id
+		userServices, count, err := models.GetAllRelationsByType(&query)
+		if err != nil {
+			logs.Error("获取用户可用的服务失败%v", err)
+			this.CustomAbort(http.StatusInternalServerError, "获取用户可用的服务失败")
+		}
+		_page.SetNums(count)
+		_page.GetTotalPages()
+		var typeService UserServiceRet
+		typeService.TypeId = appType.Id
+		typeService.TypeName = appType.Name
+		typeService.UserServices = userServices
+		typeService.PageInfo = _page
+		typeServices = append(typeServices, typeService)
+	}
+	this.Data["json"] = typeServices
+	this.ServeJSON()
+}
+// @Description 用户获取所有服务
+// @Param userName formData string true "用户名"
+// @Param page formData int true "当前页"
+// @Param pageSize formData int true "每页行数"
+// @Param typeId formData int true "应用类型id"
+// @router /queryByType [post]
+func (this *RelationController) GetServiceListByType() {
+	userName := this.GetString("userName")
+	page, _ := this.GetInt("page")
+	pageSize, _ := this.GetInt("pageSize")
+	typeId, _ := this.GetInt("typeId")
+	var query models.TypeJson
 	_page := pagination.NewPaginator(page, pageSize)
 	query.UserName = userName
 	query.Limit = pageSize
 	query.Offset = _page.Offset()
-	userServices, count, err := models.GetAllRelations(&query)
+	query.TypeId = typeId
+	userServices, count, err := models.GetAllRelationsByType(&query)
 	if err != nil {
 		logs.Error("获取用户可用的服务失败%v", err)
 		this.CustomAbort(http.StatusInternalServerError, "获取用户可用的服务失败")
 	}
 	_page.SetNums(count)
 	_page.GetTotalPages()
-	var relationRet UserServiceRet
-	relationRet.UserServices = userServices
-	relationRet.PageInfo = _page
-	this.Data["json"] = relationRet
+	var typeService TypeServiceRet
+	typeService.UserServices = userServices
+	typeService.PageInfo = _page
+	this.Data["json"] = typeService
 	this.ServeJSON()
 }
+
 // @Description 用户开启服务
 // @Param userName formData string true "用户名"
 // @Param serviceId formData string true "服务ID"

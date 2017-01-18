@@ -18,6 +18,7 @@ type ClService struct {
 	Version     string `orm:"column(version)" json:"version"`
 	ServiceDesc string `orm:"column(service_desc)" json:"serviceDesc"`
 	UpstreamUrl string `orm:"column(upstream_url)" json:"upstreamUrl"`
+	Type     *ClType `orm:"rel(fk)"`
 }
 
 type QueryCon struct {

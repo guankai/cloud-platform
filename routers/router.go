@@ -30,6 +30,11 @@ func init() {
 				&controllers.RelationController{},
 			),
 		),
+		beego.NSNamespace("/apptype",
+			beego.NSInclude(
+				&controllers.AppTypeController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }
