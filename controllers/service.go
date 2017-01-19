@@ -27,6 +27,7 @@ type ServiceRet struct {
 // @Param version formData string true "版本"
 // @Param serviceDesc formData string true "服务概述"
 // @Param upstreamUrl formData string true "服务跳转地址"
+// @Param typeId formData int true "类型id"
 // @router /add [post]
 func (this *ServiceController) AddService() {
 	serviceName := this.GetString("serviceName")
@@ -64,6 +65,7 @@ func (this *ServiceController) AddService() {
 		logs.Error("服务访问路径不能为空")
 		this.CustomAbort(http.StatusBadRequest, "服务访问路径不能为空")
 	}
+	typeId, _ := this.GetInt("typeId")
 	var service models.ClService
 	service.ServiceName = serviceName
 	service.ServicePic = servicePic
@@ -73,6 +75,12 @@ func (this *ServiceController) AddService() {
 	service.ServiceDesc = serviceDesc
 	service.UpstreamUrl = upstreamUrl
 	service.Id = uuid.NewV4().String()
+	appType, errApp := models.GetAppType(typeId)
+	if errApp != nil {
+		logs.Error("应用类型获取失败%v", errApp)
+		this.CustomAbort(http.StatusInternalServerError, "应用类型获取失败")
+	}
+	service.Type = appType
 	//注册KONG的服务
 	//生成api
 	var api km.API
@@ -80,6 +88,7 @@ func (this *ServiceController) AddService() {
 	api.UpstreamURL = upstreamUrl
 	api.Name = requestPath
 	api.StripRequestPath = true
+	api.RequestHost = requestPath
 	apiRet, errApi := kong.AddAPI(&api)
 	if errApi != nil {
 		logs.Error("服务注册失败 %v", errApi)

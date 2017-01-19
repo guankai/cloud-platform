@@ -6,6 +6,13 @@ import (
 
 func init() {
 
+	beego.GlobalControllerRouter["service-cloud/controllers:AppTypeController"] = append(beego.GlobalControllerRouter["service-cloud/controllers:AppTypeController"],
+		beego.ControllerComments{
+			Method: "GetAllAppType",
+			Router: `/`,
+			AllowHTTPMethods: []string{"get"},
+			Params: nil})
+
 	beego.GlobalControllerRouter["service-cloud/controllers:PluginController"] = append(beego.GlobalControllerRouter["service-cloud/controllers:PluginController"],
 		beego.ControllerComments{
 			Method: "GetList",
@@ -31,6 +38,13 @@ func init() {
 		beego.ControllerComments{
 			Method: "GetServiceList",
 			Router: `/query`,
+			AllowHTTPMethods: []string{"post"},
+			Params: nil})
+
+	beego.GlobalControllerRouter["service-cloud/controllers:RelationController"] = append(beego.GlobalControllerRouter["service-cloud/controllers:RelationController"],
+		beego.ControllerComments{
+			Method: "GetServiceListByType",
+			Router: `/queryByType`,
 			AllowHTTPMethods: []string{"post"},
 			Params: nil})
 
