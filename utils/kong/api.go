@@ -25,8 +25,12 @@ func AddAPI(api *models.API) (*models.API, error) {
 	// POST /apis/
 	req := httplib.Post(kongAdminURL + `/apis/`)
 	log.Println("kongAdminURL", kongAdminURL)
-	req.Param("name", api.Name)
-	req.Param("request_host", api.RequestHost)
+	if len(api.Name) > 0 {
+		req.Param("name", api.Name)
+	}
+	if len(api.RequestHost) > 0 {
+		req.Param("request_host", api.RequestHost)
+	}
 	req.Param("request_path", api.RequestPath)
 	req.Param("strip_request_path", strconv.FormatBool(api.StripRequestPath))
 	req.Param("preserve_host", strconv.FormatBool(api.PreserveHost))
