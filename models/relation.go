@@ -3,6 +3,8 @@ package models
 import (
 	"service-cloud/utils/db"
 	"time"
+	"github.com/astaxie/beego/orm"
+	"fmt"
 )
 
 type ClRelation struct {
@@ -78,10 +80,12 @@ func GetAllRelationsByType(typeJson *TypeJson) ([]UserService, int, error) {
 	var count int
 	_, err := o.Raw(`select a.service_id,a.service_name,a.service_pic,a.request_path,a.api_id,a.provider,a.create_time,a.version,a.service_desc,a.upstream_url,ifnull(b.status,'0') status,ifnull(b.relation_id,'') relation_id,ifnull(b.consumer_id,'') consumer_id,ifnull(b.api_key_id,'') api_key_id,ifnull(b.api_key,'') api_key,c.type_name from cl_service a left join cl_relation b on a.service_id = b.service_id and b.user_name = ? left join cl_type c on a.type_id = c.type_id where c.type_id = ? order by status limit ?,?`, typeJson.UserName, typeJson.TypeId, typeJson.Offset, typeJson.Limit).QueryRows(&userServiceList)
 	if err != nil {
+		fmt.Println("enter err")
 		return nil, -1, err
 	}
-	errCount := o.Raw(`select count(1) from cl_service a left join cl_relation b on a.service_id = b.service_id and b.user_name = ? left join cl_type c on a.type_id = c.type_id where c.type_id = ? order by status limit ?,?`, typeJson.UserName, typeJson.TypeId,typeJson.Offset, typeJson.Limit).QueryRow(&count)
+	errCount := o.Raw(`select count(1) from cl_service a left join cl_relation b on a.service_id = b.service_id and b.user_name = ? left join cl_type c on a.type_id = c.type_id where c.type_id = ?`, typeJson.UserName, typeJson.TypeId).QueryRow(&count)
 	if errCount != nil {
+		fmt.Println("enter errCount")
 		return nil, -1, errCount
 	}
 	return userServiceList, count, nil
@@ -112,4 +116,18 @@ func GetServiceByUser(serviceId string, userName string) (*ClRelation, error) {
 		return nil, err
 	}
 	return relation, nil
+}
+
+func GetUserServiceCount(userName string) (int, []ClRelation, error) {
+	o := db.GetOrmer()
+	var relation []ClRelation
+	count, err := o.QueryTable("cl_relation").Filter("userName", userName).All(&relation)
+	if err != nil {
+		if err == orm.ErrNoRows {
+			return 0, nil, nil
+		} else {
+			return -1, nil, err
+		}
+	}
+	return int(count), relation, nil
 }

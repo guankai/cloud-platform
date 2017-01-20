@@ -11,6 +11,7 @@ import (
 	kong "service-cloud/utils/kong"
 	"github.com/satori/go.uuid"
 	"service-cloud/utils/environment"
+	"strconv"
 )
 
 type RelationController struct {
@@ -29,6 +30,9 @@ type TypeServiceRet struct {
 	PageInfo     *pagination.Paginator `json:"pageInfo"`
 }
 
+const PAGE = 1
+const PAGESIZE = 4
+
 var SCHEMAURL = environment.GetEnv("KONG_URL", "http://13.76.42.81:8000")
 // @Description 用户获取所有服务
 // @Param userName formData string true "用户名"
@@ -37,8 +41,30 @@ var SCHEMAURL = environment.GetEnv("KONG_URL", "http://13.76.42.81:8000")
 // @router /query [post]
 func (this *RelationController) GetServiceList() {
 	userName := this.GetString("userName")
-	page, _ := this.GetInt("page")
-	pageSize, _ := this.GetInt("pageSize")
+	var page int
+	var pageSize int
+	pageStr := this.GetString("page")
+	if len(pageStr) != 0 {
+		var errPage error
+		page, errPage = strconv.Atoi(pageStr)
+		if errPage != nil {
+			logs.Error("请求参数page解析错误%v", errPage)
+			this.CustomAbort(http.StatusBadRequest, "请求参数page解析错误")
+		}
+	} else {
+		page = PAGE
+	}
+	pageSizeStr := this.GetString("pageSize")
+	if len(pageSizeStr) != 0 {
+		var errPageSize error
+		pageSize, errPageSize = strconv.Atoi(pageSizeStr)
+		if errPageSize != nil {
+			logs.Error("请求参数page解析错误%v", errPageSize)
+			this.CustomAbort(http.StatusBadRequest, "请求参数page解析错误")
+		}
+	} else {
+		pageSize = PAGESIZE
+	}
 	//获取所有的appType
 	appTypes, errApp := models.GetAppTypes()
 	if errApp != nil {
@@ -87,6 +113,8 @@ func (this *RelationController) GetServiceListByType() {
 	query.Limit = pageSize
 	query.Offset = _page.Offset()
 	query.TypeId = typeId
+	logs.Debug("limit is %v", query.Limit)
+	logs.Debug("offset is %v", query.Offset)
 	userServices, count, err := models.GetAllRelationsByType(&query)
 	if err != nil {
 		logs.Error("获取用户可用的服务失败%v", err)
@@ -121,16 +149,30 @@ func (this *RelationController) EnableService() {
 	if err != nil {
 		if err == orm.ErrNoRows {
 			//用户之前未开启过服务,需要开启服务
-			//为用户创建consumer
-			var consumer km.Consumer
-			consumer.Username = userName
-			consumerRet, errCon := kong.AddConsumer(&consumer)
-			if errCon != nil {
-				logs.Error("生成服务消费者失败%v", errCon)
-				this.CustomAbort(http.StatusInternalServerError, "生成服务消费者失败")
+
+			consumerCount, relaList, errCount := models.GetUserServiceCount(userName)
+			if errCount != nil {
+				logs.Error("获取用户服务数失败%v", errCount)
+				this.CustomAbort(http.StatusInternalServerError, "获取用户服务数失败")
 			}
+			var consumerId string
+			if consumerCount == 0 {
+				//为用户创建consumer
+				var consumer km.Consumer
+				consumer.Username = userName
+				consumerRet, errCon := kong.AddConsumer(&consumer)
+				if errCon != nil {
+					logs.Error("生成服务消费者失败%v", errCon)
+					this.CustomAbort(http.StatusInternalServerError, "生成服务消费者失败")
+				}
+				consumerId = consumerRet.ID
+			} else {
+				//无需创建consumer
+				consumerId = relaList[0].ConsumerId
+			}
+
 			//为用户设置apikey
-			apiKeyRet, errKey := kong.CreateAPIKey(consumerRet.ID, "")
+			apiKeyRet, errKey := kong.CreateAPIKey(consumerId, "")
 			if errKey != nil {
 				logs.Error("生成APIKEY失败", errKey)
 				this.CustomAbort(http.StatusInternalServerError, "生成APIKEY失败")
@@ -146,7 +188,7 @@ func (this *RelationController) EnableService() {
 			relationInsert.UserName = userName
 			relationInsert.ApiKey = apiKeyRet.Key
 			relationInsert.ApiKeyId = apiKeyRet.ID
-			relationInsert.ConsumerId = consumerRet.ID
+			relationInsert.ConsumerId = consumerId
 			relationInsert.Service = _service
 			relationInsert.Status = "1"
 			relationInsert.RelationId = uuid.NewV4().String()
