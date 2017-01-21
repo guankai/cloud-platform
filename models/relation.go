@@ -63,11 +63,11 @@ func GetAllRelations(relJson *RelJson) ([]UserService, int, error) {
 	o := db.GetOrmer()
 	var userServiceList []UserService
 	var count int
-	_, err := o.Raw(`select a.service_id,a.service_name,a.service_pic,a.request_path,a.api_id,a.provider,a.create_time,a.version,a.service_desc,a.upstream_url,ifnull(b.status,'0') status,ifnull(b.relation_id,'') relation_id,ifnull(b.consumer_id,'') consumer_id,ifnull(b.api_key_id,'') api_key_id,ifnull(b.api_key,'') api_key,c.type_name from cl_service a left join cl_relation b on a.service_id = b.service_id and b.user_name = ? left join cl_type c on a.type_id = c.type_id order by status limit ?,?`, relJson.UserName, relJson.Offset, relJson.Limit).QueryRows(&userServiceList)
+	_, err := o.Raw(`select a.service_id,a.service_name,a.service_pic,a.request_path,a.api_id,a.provider,a.create_time,a.version,a.service_desc,a.upstream_url,ifnull(b.status,'0') status,ifnull(b.relation_id,'') relation_id,ifnull(b.consumer_id,'') consumer_id,ifnull(b.api_key_id,'') api_key_id,ifnull(b.api_key,'') api_key,c.type_name from cl_service a left join cl_relation b on a.service_id = b.service_id and b.user_name = ? left join cl_type c on a.type_id = c.type_id order by status desc limit ?,?`, relJson.UserName, relJson.Offset, relJson.Limit).QueryRows(&userServiceList)
 	if err != nil {
 		return nil, -1, err
 	}
-	errCount := o.Raw(`select count(1) from cl_service a left join cl_relation b on a.service_id = b.service_id and b.user_name = ? left join cl_type c on a.type_id = c.type_id order by status limit ?,?`, relJson.UserName, relJson.Offset, relJson.Limit).QueryRow(&count)
+	errCount := o.Raw(`select count(1) from cl_service a left join cl_relation b on a.service_id = b.service_id and b.user_name = ? left join cl_type c on a.type_id = c.type_id`, relJson.UserName).QueryRow(&count)
 	if errCount != nil {
 		return nil, -1, errCount
 	}
@@ -78,7 +78,7 @@ func GetAllRelationsByType(typeJson *TypeJson) ([]UserService, int, error) {
 	o := db.GetOrmer()
 	var userServiceList []UserService
 	var count int
-	_, err := o.Raw(`select a.service_id,a.service_name,a.service_pic,a.request_path,a.api_id,a.provider,a.create_time,a.version,a.service_desc,a.upstream_url,ifnull(b.status,'0') status,ifnull(b.relation_id,'') relation_id,ifnull(b.consumer_id,'') consumer_id,ifnull(b.api_key_id,'') api_key_id,ifnull(b.api_key,'') api_key,c.type_name from cl_service a left join cl_relation b on a.service_id = b.service_id and b.user_name = ? left join cl_type c on a.type_id = c.type_id where c.type_id = ? order by status limit ?,?`, typeJson.UserName, typeJson.TypeId, typeJson.Offset, typeJson.Limit).QueryRows(&userServiceList)
+	_, err := o.Raw(`select a.service_id,a.service_name,a.service_pic,a.request_path,a.api_id,a.provider,a.create_time,a.version,a.service_desc,a.upstream_url,ifnull(b.status,'0') status,ifnull(b.relation_id,'') relation_id,ifnull(b.consumer_id,'') consumer_id,ifnull(b.api_key_id,'') api_key_id,ifnull(b.api_key,'') api_key,c.type_name from cl_service a left join cl_relation b on a.service_id = b.service_id and b.user_name = ? left join cl_type c on a.type_id = c.type_id where c.type_id = ? order by status desc limit ?,?`, typeJson.UserName, typeJson.TypeId, typeJson.Offset, typeJson.Limit).QueryRows(&userServiceList)
 	if err != nil {
 		fmt.Println("enter err")
 		return nil, -1, err
