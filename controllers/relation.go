@@ -197,7 +197,7 @@ func (this *RelationController) EnableService() {
 				logs.Error("服务开启失败%v", errRel)
 				this.CustomAbort(http.StatusInternalServerError, "服务开启失败")
 			}
-			this.Data["json"] = map[string]string{"msg":"服务开启成功", "apikey":apiKeyRet.Key, "requestPath":SCHEMAURL + _service.RequestPath}
+			this.Data["json"] = map[string]string{"msg":"服务开启成功", "apiKey":apiKeyRet.Key, "requestPath":SCHEMAURL + _service.RequestPath}
 		} else {
 			logs.Error("开启服务失败%v", err)
 			this.CustomAbort(http.StatusInternalServerError, "开启服务失败")
