@@ -1,7 +1,7 @@
 package kong
 
 import (
-	"service-cloud/utils/kong/models"
+	"cloud-platform/utils/kong/models"
 	"testing"
 )
 

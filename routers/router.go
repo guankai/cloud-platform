@@ -8,7 +8,7 @@
 package routers
 
 import (
-	"service-cloud/controllers"
+	"cloud-platform/controllers"
 
 	"github.com/astaxie/beego"
 )

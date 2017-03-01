@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
-	"service-cloud/models"
+	"cloud-platform/models"
 	"github.com/astaxie/beego/logs"
 	"net/http"
 )

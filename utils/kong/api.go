@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"service-cloud/utils/kong/models"
+	"cloud-platform/utils/kong/models"
 	"strconv"
 
 	"encoding/json"

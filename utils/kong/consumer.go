@@ -6,7 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
-	"service-cloud/utils/kong/models"
+	"cloud-platform/utils/kong/models"
 	"strconv"
 
 	"github.com/astaxie/beego/httplib"

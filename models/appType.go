@@ -1,6 +1,6 @@
 package models
 
-import "service-cloud/utils/db"
+import "cloud-platform/utils/db"
 
 // 应用类型
 type ClType struct {

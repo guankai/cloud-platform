@@ -1,6 +1,6 @@
 package models
 
-import "service-cloud/utils/db"
+import "cloud-platform/utils/db"
 //插件
 type ClPlugin struct {
 	Id   string `orm:"pk;column(plugin_id)" json:"pluginId"`

@@ -1,7 +1,7 @@
 package models
 
 import (
-	"service-cloud/utils/db"
+	"cloud-platform/utils/db"
 	"time"
 	"github.com/astaxie/beego/orm"
 	"fmt"

@@ -4,7 +4,7 @@ import (
 	"github.com/astaxie/beego"
 	"net/http"
 	"github.com/astaxie/beego/logs"
-	"service-cloud/models"
+	"cloud-platform/models"
 )
 
 type PluginController struct {

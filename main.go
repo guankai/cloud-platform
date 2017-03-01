@@ -1,11 +1,11 @@
 package main
 
 import (
-	_ "service-cloud/routers"
+	_ "cloud-platform/routers"
 	"github.com/astaxie/beego"
-	"service-cloud/utils/db"
+	"cloud-platform/utils/db"
 	_ "github.com/go-sql-driver/mysql"
-	_ "service-cloud/models"
+	_ "cloud-platform/models"
 )
 
 func main() {

@@ -1,6 +1,6 @@
 package kong
 
-import "service-cloud/utils/environment"
+import "cloud-platform/utils/environment"
 
 var kongAdminURL string
 

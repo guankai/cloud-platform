@@ -2,7 +2,7 @@ package models
 
 import (
 	"time"
-	"service-cloud/utils/db"
+	"cloud-platform/utils/db"
 	"github.com/astaxie/beego/orm"
 )
 

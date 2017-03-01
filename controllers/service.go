@@ -4,11 +4,11 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"net/http"
-	km "service-cloud/utils/kong/models"
-	kong "service-cloud/utils/kong"
-	"service-cloud/models"
+	km "cloud-platform/utils/kong/models"
+	kong "cloud-platform/utils/kong"
+	"cloud-platform/models"
 	"github.com/satori/go.uuid"
-	"service-cloud/utils/pagination"
+	"cloud-platform/utils/pagination"
 )
 
 type ServiceController struct {

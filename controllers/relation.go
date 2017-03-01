@@ -2,15 +2,15 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
-	"service-cloud/utils/pagination"
-	"service-cloud/models"
+	"cloud-platform/utils/pagination"
+	"cloud-platform/models"
 	"github.com/astaxie/beego/logs"
 	"net/http"
 	"github.com/astaxie/beego/orm"
-	km "service-cloud/utils/kong/models"
-	kong "service-cloud/utils/kong"
+	km "cloud-platform/utils/kong/models"
+	kong "cloud-platform/utils/kong"
 	"github.com/satori/go.uuid"
-	"service-cloud/utils/environment"
+	"cloud-platform/utils/environment"
 	"strconv"
 )
 
