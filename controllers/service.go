@@ -75,6 +75,7 @@ func (this *ServiceController) AddService() {
 	service.ServiceDesc = serviceDesc
 	service.UpstreamUrl = upstreamUrl
 	service.Id = uuid.NewV4().String()
+	service.CallPath = SCHEMAURL + service.RequestPath
 	appType, errApp := models.GetAppType(typeId)
 	if errApp != nil {
 		logs.Error("应用类型获取失败%v", errApp)
@@ -89,6 +90,7 @@ func (this *ServiceController) AddService() {
 	api.Name = requestPath
 	api.StripRequestPath = true
 	api.RequestHost = requestPath
+	beego.Debug("the api is ", &api)
 	apiRet, errApi := kong.AddAPI(&api)
 	if errApi != nil {
 		logs.Error("服务注册失败 %v", errApi)
@@ -104,6 +106,7 @@ func (this *ServiceController) AddService() {
 	}
 	service.Plugin = plugin
 	// todo 调用插件API关联apis和plugin
+	beego.Debug("the Id is ", apiRet.ID)
 	_, errKong := kong.AddKeyAuthPlugin2Api(apiRet.ID)
 	if errKong != nil {
 		logs.Error("关联API和plugin失败%v", errKong)

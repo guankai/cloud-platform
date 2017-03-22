@@ -15,6 +15,7 @@ type ClRelation struct {
 	ApiKey     string `orm:"column(api_key)" json:"apiKey"`
 	ConsumerId string `orm:"column(consumer_id)" json:"consumerId"`
 	Status     string `orm:"column(status)" json:"status"`
+	AccessNum  int    `orm:"column(access_num)" json:"accessNum"`
 }
 
 type UserService struct {
@@ -111,7 +112,7 @@ func SetStatus(relationId string, status string, apiKey string, apikeyId string)
 func GetServiceByUser(serviceId string, userName string) (*ClRelation, error) {
 	o := db.GetOrmer()
 	relation := new(ClRelation)
-	err := o.QueryTable("cl_relation").Filter("service_id", serviceId).Filter("userName", userName).RelatedSel().One(relation)
+	err := o.QueryTable("cl_relation").Filter("service_id", serviceId).Filter("user_name", userName).RelatedSel().One(relation)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +122,7 @@ func GetServiceByUser(serviceId string, userName string) (*ClRelation, error) {
 func GetUserServiceCount(userName string) (int, []ClRelation, error) {
 	o := db.GetOrmer()
 	var relation []ClRelation
-	count, err := o.QueryTable("cl_relation").Filter("userName", userName).All(&relation)
+	count, err := o.QueryTable("cl_relation").Filter("user_name", userName).RelatedSel().All(&relation)
 	if err != nil {
 		if err == orm.ErrNoRows {
 			return 0, nil, nil

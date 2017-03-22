@@ -33,14 +33,13 @@ type TypeServiceRet struct {
 const PAGE = 1
 const PAGESIZE = 4
 
-var SCHEMAURL = environment.GetEnv("KONG_URL", "http://13.76.42.81:8000")
+var SCHEMAURL = environment.GetEnv("KONG_URL", "http://223.202.32.56:8055")
 // @Description 用户获取所有服务
-// @Param userName formData string true "用户名"
 // @Param page formData int true "当前页"
 // @Param pageSize formData int true "每页行数"
 // @router /query [post]
 func (this *RelationController) GetServiceList() {
-	userName := this.GetString("userName")
+	userName := this.Ctx.Input.Header("UserName")
 	var page int
 	var pageSize int
 	pageStr := this.GetString("page")
@@ -130,11 +129,10 @@ func (this *RelationController) GetServiceListByType() {
 }
 
 // @Description 用户开启服务
-// @Param userName formData string true "用户名"
 // @Param serviceId formData string true "服务ID"
 // @router /startup [post]
 func (this *RelationController) EnableService() {
-	userName := this.GetString("userName")
+	userName := this.Ctx.Input.Header("UserName")
 	if len(userName) == 0 {
 		logs.Error("用户名不可为空")
 		this.CustomAbort(http.StatusBadRequest, "用户名不可为空")
@@ -192,6 +190,7 @@ func (this *RelationController) EnableService() {
 			relationInsert.Service = _service
 			relationInsert.Status = "1"
 			relationInsert.RelationId = uuid.NewV4().String()
+			relationInsert.AccessNum = 0
 			errRel := models.InsertRelation(relationInsert)
 			if errRel != nil {
 				logs.Error("服务开启失败%v", errRel)
@@ -259,5 +258,22 @@ func (this *RelationController) ShutdownService() {
 		this.CustomAbort(http.StatusInternalServerError, "服务关闭失败")
 	}
 	this.Data["json"] = map[string]string{"msg":"服务关闭成功", "requestPath":SCHEMAURL + relation.Service.RequestPath}
+	this.ServeJSON()
+}
+// @Description 获取用户已经开启的服务
+// @router /open [get]
+func (this *RelationController) GetUserOwnerService(){
+	userName := this.Ctx.Input.Header("UserName")
+	if len(userName) == 0 {
+		logs.Error("没有用户名信息")
+		this.CustomAbort(http.StatusBadRequest, "请先登录")
+	}
+	_,relations,err := models.GetUserServiceCount(userName)
+	if err != nil{
+		logs.Error("查询用户服务失败 %v",err)
+		this.CustomAbort(http.StatusInternalServerError,"查询用户服务失败")
+	}
+	logs.Debug("the relations is +%v", relations)
+	this.Data["json"] = relations
 	this.ServeJSON()
 }

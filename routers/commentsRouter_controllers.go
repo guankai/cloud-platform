@@ -62,6 +62,13 @@ func init() {
 			AllowHTTPMethods: []string{"post"},
 			Params: nil})
 
+	beego.GlobalControllerRouter["cloud-platform/controllers:RelationController"] = append(beego.GlobalControllerRouter["cloud-platform/controllers:RelationController"],
+		beego.ControllerComments{
+			Method: "GetUserOwnerService",
+			Router: `/open`,
+			AllowHTTPMethods: []string{"get"},
+			Params: nil})
+
 	beego.GlobalControllerRouter["cloud-platform/controllers:ServiceController"] = append(beego.GlobalControllerRouter["cloud-platform/controllers:ServiceController"],
 		beego.ControllerComments{
 			Method: "AddService",

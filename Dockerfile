@@ -2,8 +2,8 @@ FROM alpine:3.4
 
 MAINTAINER k.guan@hnair.com
 
-ENV KONG_URL=http://13.76.42.81:8000
-ENV KONG_ADMIN_URL=http://13.76.42.81:8001
+ENV KONG_URL=http://223.202.32.56:8055/
+ENV KONG_ADMIN_URL=http://223.202.32.56:8056/
 
 COPY cloud-platform /usr/bin/cloud-platform
 

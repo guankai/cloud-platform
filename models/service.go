@@ -18,7 +18,8 @@ type ClService struct {
 	Version     string `orm:"column(version)" json:"version"`
 	ServiceDesc string `orm:"column(service_desc)" json:"serviceDesc"`
 	UpstreamUrl string `orm:"column(upstream_url)" json:"upstreamUrl"`
-	Type     *ClType `orm:"rel(fk)"`
+	CallPath    string `orm:"column(call_path)" json:"callPath"`
+	Type        *ClType `orm:"rel(fk)"`
 }
 
 type QueryCon struct {
@@ -52,7 +53,7 @@ func GetServiceList(queryJson *QueryCon) ([]ClService, int, error) {
 	}
 	qs = qs.OrderBy("-create_time")
 
-	_, err := qs.Limit(queryJson.Limit, queryJson.Offset).All(&serviceList)
+	_, err := qs.Limit(queryJson.Limit, queryJson.Offset).RelatedSel().All(&serviceList)
 	if err != nil {
 		return nil, -1, err
 	}
