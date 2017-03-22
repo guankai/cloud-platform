@@ -225,11 +225,10 @@ func (this *RelationController) EnableService() {
 }
 
 // @Description 关闭服务
-// @Param userName formData string true "用户名"
-// @Param serviceId formData string true "服务名"
+// @Param serviceId formData string true "服务ID"
 // @router /shutdown [post]
 func (this *RelationController) ShutdownService() {
-	userName := this.GetString("userName")
+	userName := this.Ctx.Input.Header("UserName")
 	if len(userName) == 0 {
 		logs.Error("用户名不可为空")
 		this.CustomAbort(http.StatusBadRequest, "用户名不可为空")
@@ -261,7 +260,7 @@ func (this *RelationController) ShutdownService() {
 	this.ServeJSON()
 }
 // @Description 获取用户已经开启的服务
-// @router /open [get]
+// @router /getOpened [get]
 func (this *RelationController) GetUserOwnerService(){
 	userName := this.Ctx.Input.Header("UserName")
 	if len(userName) == 0 {
