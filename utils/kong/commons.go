@@ -1,9 +1,12 @@
 package kong
 
-import "cloud-platform/utils/environment"
+import (
+	"cloud-platform/utils/environment"
+	"github.com/astaxie/beego"
+)
 
 var kongAdminURL string
 
 func init() {
-	kongAdminURL = environment.GetEnv("KONG_ADMIN_URL", "http://223.202.32.56:8056")
+	kongAdminURL = environment.GetEnv("KONG_ADMIN_URL", beego.AppConfig.String("kong_admin_url"))
 }

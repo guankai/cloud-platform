@@ -33,7 +33,7 @@ type TypeServiceRet struct {
 const PAGE = 1
 const PAGESIZE = 4
 
-var SCHEMAURL = environment.GetEnv("KONG_URL", "http://223.202.32.56:8055")
+var SCHEMAURL = environment.GetEnv("KONG_URL", beego.AppConfig.String("kong_url"))
 // @Description 用户获取所有服务
 // @Param page formData int true "当前页"
 // @Param pageSize formData int true "每页行数"

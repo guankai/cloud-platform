@@ -19,6 +19,7 @@ type ClService struct {
 	ServiceDesc string `orm:"column(service_desc)" json:"serviceDesc"`
 	UpstreamUrl string `orm:"column(upstream_url)" json:"upstreamUrl"`
 	CallPath    string `orm:"column(call_path)" json:"callPath"`
+	UserName    string `orm:"column(user_name)" json:"userName"`
 	Type        *ClType `orm:"rel(fk)"`
 }
 

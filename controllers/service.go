@@ -27,7 +27,6 @@ type ServiceRet struct {
 // @Param version formData string true "版本"
 // @Param serviceDesc formData string true "服务概述"
 // @Param upstreamUrl formData string true "服务跳转地址"
-// @Param typeId formData int true "类型id"
 // @router /add [post]
 func (this *ServiceController) AddService() {
 	serviceName := this.GetString("serviceName")
@@ -65,7 +64,8 @@ func (this *ServiceController) AddService() {
 		logs.Error("服务访问路径不能为空")
 		this.CustomAbort(http.StatusBadRequest, "服务访问路径不能为空")
 	}
-	typeId, _ := this.GetInt("typeId")
+	var typeId int
+
 	var service models.ClService
 	service.ServiceName = serviceName
 	service.ServicePic = servicePic
@@ -76,6 +76,13 @@ func (this *ServiceController) AddService() {
 	service.UpstreamUrl = upstreamUrl
 	service.Id = uuid.NewV4().String()
 	service.CallPath = SCHEMAURL + service.RequestPath
+	userName := this.Ctx.Input.Header("UserName")
+	if len(userName) != 0 {
+		typeId = 2
+		service.UserName = userName
+	} else {
+		typeId = 1
+	}
 	appType, errApp := models.GetAppType(typeId)
 	if errApp != nil {
 		logs.Error("应用类型获取失败%v", errApp)
