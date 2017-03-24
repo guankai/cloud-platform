@@ -86,7 +86,9 @@ func (this *ServiceController) AddService() {
 	appType, errApp := models.GetAppType(typeId)
 	if errApp != nil {
 		logs.Error("应用类型获取失败%v", errApp)
-		this.CustomAbort(http.StatusInternalServerError, "应用类型获取失败")
+		this.Data["json"] = models.NewErrorInfo("应用类型获取失败")
+		this.ServeJSON()
+		return
 	}
 	service.Type = appType
 	//注册KONG的服务
@@ -101,7 +103,9 @@ func (this *ServiceController) AddService() {
 	apiRet, errApi := kong.AddAPI(&api)
 	if errApi != nil {
 		logs.Error("服务注册失败 %v", errApi)
-		this.CustomAbort(http.StatusInternalServerError, "服务注册失败")
+		this.Data["json"] = models.NewErrorInfo("服务注册失败")
+		this.ServeJSON()
+		return
 	}
 	service.ApiId = apiRet.ID
 	logs.Debug("the api_id is %s", apiRet.ID)
@@ -109,7 +113,9 @@ func (this *ServiceController) AddService() {
 	plugin, errPlugin := models.GetPluginByName("key-auth")
 	if errPlugin != nil {
 		logs.Error("获取插件失败 %v", errPlugin)
-		this.CustomAbort(http.StatusInternalServerError, "获取插件失败")
+		this.Data["json"] = models.NewErrorInfo("获取插件失败")
+		this.ServeJSON()
+		return
 	}
 	service.Plugin = plugin
 	// todo 调用插件API关联apis和plugin
@@ -117,14 +123,18 @@ func (this *ServiceController) AddService() {
 	_, errKong := kong.AddKeyAuthPlugin2Api(apiRet.ID)
 	if errKong != nil {
 		logs.Error("关联API和plugin失败%v", errKong)
-		this.CustomAbort(http.StatusInternalServerError, "关联API和plugin失败")
+		this.Data["json"] = models.NewErrorInfo("关联API和plugin失败")
+		this.ServeJSON()
+		return
 	}
 	errService := models.InsertService(&service)
 	if errService != nil {
 		logs.Error("服务注册失败 %v", errService)
-		this.CustomAbort(http.StatusInternalServerError, "服务注册失败")
+		this.Data["json"] = models.NewErrorInfo("服务注册失败")
+		this.ServeJSON()
+		return
 	}
-	this.Data["json"] = "服务注册成功"
+	this.Data["json"] = models.NewNormalInfo("Success")
 	this.ServeJSON()
 }
 // @Description "根据条件查询所有条件列表"
@@ -144,7 +154,9 @@ func (this *ServiceController) QueryServiceList() {
 	serviceList, count, err := models.GetServiceList(&query)
 	if err != nil {
 		logs.Error("获取服务列表失败%v", err)
-		this.CustomAbort(http.StatusInternalServerError, "获取服务列表失败")
+		this.Data["json"] = models.NewErrorInfo("获取服务列表失败")
+		this.ServeJSON()
+		return
 	}
 	_page.SetNums(count)
 	_page.GetTotalPages()
@@ -210,7 +222,9 @@ func (this *ServiceController) UpdateService() {
 	currService, err := models.GetService(serviceId)
 	if err != nil {
 		logs.Error("获取服务失败%v", err)
-		this.CustomAbort(http.StatusInternalServerError, "获取服务失败")
+		this.Data["json"] = models.NewErrorInfo("获取服务失败")
+		this.ServeJSON()
+		return
 	}
 	if currService.RequestPath != `/` + requestPath || currService.UpstreamUrl != upstreamUrl {
 		//todo 调用KONG API对相应的apiId进行更新
@@ -221,7 +235,9 @@ func (this *ServiceController) UpdateService() {
 		_, errUpd := kong.UpdateAPI(currService.ApiId, &updApi)
 		if errUpd != nil {
 			logs.Error("更新API失败%v", errUpd)
-			this.CustomAbort(http.StatusInternalServerError, "更新API失败")
+			this.Data["json"] = models.NewErrorInfo("更新API失败")
+			this.ServeJSON()
+			return
 		}
 	}
 	//更新数据库
@@ -236,9 +252,11 @@ func (this *ServiceController) UpdateService() {
 	errUpd := models.UpdService(&service)
 	if errUpd != nil {
 		logs.Error("更新服务失败%v", errUpd)
-		this.CustomAbort(http.StatusInternalServerError, "更新服务失败")
+		this.Data["json"] = models.NewErrorInfo("更新服务失败")
+		this.ServeJSON()
+		return
 	}
-	this.Data["json"] = map[string]string{"msg":"更新服务成功"}
+	this.Data["json"] = models.NewNormalInfo("Success")
 	this.ServeJSON()
 }
 // @Description 删除服务
@@ -250,19 +268,25 @@ func (this *ServiceController) DeleteService() {
 	_service, err := models.GetService(serviceId)
 	if err != nil {
 		logs.Error("获取服务失败%v", err)
-		this.CustomAbort(http.StatusInternalServerError, "获取服务失败")
+		this.Data["json"] = models.NewErrorInfo("获取服务失败")
+		this.ServeJSON()
+		return
 	}
 	errDel := kong.DeleteAPI(_service.ApiId)
 	if errDel != nil {
 		logs.Error("删除服务失败%v", errDel)
-		this.CustomAbort(http.StatusInternalServerError, "删除服务失败")
+		this.Data["json"] = models.NewErrorInfo("删除服务失败")
+		this.ServeJSON()
+		return
 	}
 	//删除数据库中的API
 	errSer := models.DelService(serviceId)
 	if errSer != nil {
 		logs.Error("删除服务失败%v", errSer)
-		this.CustomAbort(http.StatusInternalServerError, "删除服务失败")
+		this.Data["json"] = models.NewErrorInfo("删除服务失败")
+		this.ServeJSON()
+		return
 	}
-	this.Data["json"] = "删除服务成功"
+	this.Data["json"] = models.NewNormalInfo("Success")
 	this.ServeJSON()
 }

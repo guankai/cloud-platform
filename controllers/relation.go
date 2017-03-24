@@ -161,7 +161,9 @@ func (this *RelationController) EnableService() {
 				consumerRet, errCon := kong.AddConsumer(&consumer)
 				if errCon != nil {
 					logs.Error("生成服务消费者失败%v", errCon)
-					this.CustomAbort(http.StatusInternalServerError, "生成服务消费者失败")
+					this.Data["json"] = models.NewErrorInfo("生成服务消费者失败")
+					this.ServeJSON()
+					return
 				}
 				consumerId = consumerRet.ID
 			} else {
@@ -173,13 +175,17 @@ func (this *RelationController) EnableService() {
 			apiKeyRet, errKey := kong.CreateAPIKey(consumerId, "")
 			if errKey != nil {
 				logs.Error("生成APIKEY失败", errKey)
-				this.CustomAbort(http.StatusInternalServerError, "生成APIKEY失败")
+				this.Data["json"] = models.NewErrorInfo("生成APIKEY失败")
+				this.ServeJSON()
+				return
 			}
 			//获取service
 			_service, errSer := models.GetService(serviceId)
 			if errSer != nil {
 				logs.Error("获取服务失败%v", errSer)
-				this.CustomAbort(http.StatusInternalServerError, "获取服务失败")
+				this.Data["json"] = models.NewErrorInfo("获取服务失败")
+				this.ServeJSON()
+				return
 			}
 			//更新数据库
 			relationInsert := new(models.ClRelation)
@@ -194,31 +200,39 @@ func (this *RelationController) EnableService() {
 			errRel := models.InsertRelation(relationInsert)
 			if errRel != nil {
 				logs.Error("服务开启失败%v", errRel)
-				this.CustomAbort(http.StatusInternalServerError, "服务开启失败")
+				this.Data["json"] = models.NewErrorInfo("服务开启失败")
+				this.ServeJSON()
+				return
 			}
 			this.Data["json"] = map[string]string{"msg":"服务开启成功", "apiKey":apiKeyRet.Key, "requestPath":SCHEMAURL + _service.RequestPath}
 		} else {
 			logs.Error("开启服务失败%v", err)
-			this.CustomAbort(http.StatusInternalServerError, "开启服务失败")
+			this.Data["json"] = models.NewErrorInfo("服务开启失败")
+			this.ServeJSON()
+			return
 		}
 	} else {
 		//用户之前开启过服务,只需要重新申请apikey
 		if relation.Status == "1" {
-			this.Data["json"] = map[string]string{"msg":"服务已经开启", "apiKey":relation.ApiKey, "requestPath":SCHEMAURL + relation.Service.RequestPath}
+			this.Data["json"] = map[string]string{"code":"0", "msg":"服务已经开启", "apiKey":relation.ApiKey, "requestPath":SCHEMAURL + relation.Service.RequestPath}
 		} else {
 			//为用户设置apikey
 			apikeyRet, errKey := kong.CreateAPIKey(relation.ConsumerId, "")
 			if errKey != nil {
 				logs.Error("生成APIKEY失败%v", errKey)
-				this.CustomAbort(http.StatusInternalServerError, "生成APIKEY失败")
+				this.Data["json"] = models.NewErrorInfo("生成APIKEY失败")
+				this.ServeJSON()
+				return
 			}
 			//更新relation
 			errUpd := models.SetStatus(relation.RelationId, "1", apikeyRet.Key, apikeyRet.ID)
 			if errUpd != nil {
 				logs.Error("开启服务失败%v", errUpd)
-				this.CustomAbort(http.StatusInternalServerError, "开启服务失败")
+				this.Data["json"] = models.NewErrorInfo("生成APIKEY失败")
+				this.ServeJSON()
+				return
 			}
-			this.Data["json"] = map[string]string{"msg":"服务已经开启", "apiKey":apikeyRet.Key, "requestPath":SCHEMAURL + relation.Service.RequestPath}
+			this.Data["json"] = map[string]string{"code":"0", "msg":"服务已经开启", "apiKey":apikeyRet.Key, "requestPath":SCHEMAURL + relation.Service.RequestPath}
 		}
 	}
 	this.ServeJSON()
@@ -242,35 +256,45 @@ func (this *RelationController) ShutdownService() {
 	relation, err := models.GetServiceByUser(serviceId, userName)
 	if err != nil {
 		logs.Error("服务查询失败%v", err)
-		this.CustomAbort(http.StatusInternalServerError, "服务查询失败")
+		this.Data["json"] = models.NewErrorInfo("服务查询失败")
+		this.ServeJSON()
+		return
 	}
 	//删除KONG对应的apikey
 	errKong := kong.DeleteAPIKey(relation.ConsumerId, relation.ApiKeyId)
 	if errKong != nil {
 		logs.Error("删除apikey失败%v", errKong)
-		this.CustomAbort(http.StatusInternalServerError, "删除apikey失败")
+		this.Data["json"] = models.NewErrorInfo("删除apikey失败")
+		this.ServeJSON()
+		return
 	}
 	//更新对应的status
-	errUpd := models.SetStatus(relation.RelationId, "0", relation.ApiKey, relation.ApiKeyId)
+	errUpd := models.SetStatus(relation.RelationId, "0", "", "")
 	if errUpd != nil {
 		logs.Error("服务关闭失败%v", errUpd)
-		this.CustomAbort(http.StatusInternalServerError, "服务关闭失败")
+		this.Data["json"] = models.NewErrorInfo("服务关闭失败")
+		this.ServeJSON()
+		return
 	}
-	this.Data["json"] = map[string]string{"msg":"服务关闭成功", "requestPath":SCHEMAURL + relation.Service.RequestPath}
+	this.Data["json"] = map[string]string{"code":"0", "msg":"服务关闭成功", "requestPath":SCHEMAURL + relation.Service.RequestPath}
 	this.ServeJSON()
 }
 // @Description 获取用户已经开启的服务
 // @router /getOpened [get]
-func (this *RelationController) GetUserOwnerService(){
+func (this *RelationController) GetUserOwnerService() {
 	userName := this.Ctx.Input.Header("UserName")
 	if len(userName) == 0 {
 		logs.Error("没有用户名信息")
-		this.CustomAbort(http.StatusBadRequest, "请先登录")
+		this.Data["json"] = models.NewErrorInfo("请先登录")
+		this.ServeJSON()
+		return
 	}
-	_,relations,err := models.GetUserServiceCount(userName)
-	if err != nil{
-		logs.Error("查询用户服务失败 %v",err)
-		this.CustomAbort(http.StatusInternalServerError,"查询用户服务失败")
+	_, relations, err := models.GetUserServiceCount(userName)
+	if err != nil {
+		logs.Error("查询用户服务失败 %v", err)
+		this.Data["json"] = models.NewErrorInfo("查询用户服务失败")
+		this.ServeJSON()
+		return
 	}
 	logs.Debug("the relations is +%v", relations)
 	this.Data["json"] = relations
