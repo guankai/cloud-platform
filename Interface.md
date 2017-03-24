@@ -10,6 +10,10 @@
 
 post
 
+`header`
+
+UserName (用户添加自己的服务时,需要在header中添加username)
+
 `formdata`
 
 - serviceName 服务名称, 必须
@@ -19,7 +23,6 @@ post
 - version 版本，必须
 - serviceDesc 服务描述
 - upstreamUrl 服务backend地址，必须
-- typeId 类型id，必须
 
 `response`
 
