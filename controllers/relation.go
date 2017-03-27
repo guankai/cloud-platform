@@ -300,3 +300,31 @@ func (this *RelationController) GetUserOwnerService() {
 	this.Data["json"] = relations
 	this.ServeJSON()
 }
+// @Description 通过serviceId获取用户服务信息
+// @Param serviceId path string true "服务uuid"
+// @router /service/:serviceId [get]
+func (this *RelationController) GetService() {
+	userName := this.Ctx.Input.Header("UserName")
+	if len(userName) == 0{
+		beego.Error("header中没有找到用户名")
+		this.Data["json"] = models.NewErrorInfo("用户名不能为空")
+		this.ServeJSON()
+		return
+	}
+	serviceId := this.GetString(":serviceId")
+	if len(serviceId) == 0{
+		beego.Error("serviceId不能为空")
+		this.Data["json"] = models.NewErrorInfo("serviceId不能为空")
+		this.ServeJSON()
+		return
+	}
+	relation, err := models.GetServiceByUser(serviceId,userName)
+	if err != nil{
+		beego.Error("获取service失败",err)
+		this.Data["json"] = models.NewErrorInfo("获取service失败")
+		this.ServeJSON()
+		return
+	}
+	this.Data["json"] = relation
+	this.ServeJSON()
+}
