@@ -318,13 +318,13 @@ func (this *RelationController) GetService() {
 		this.ServeJSON()
 		return
 	}
-	relation, err := models.GetServiceByUser(serviceId, userName)
+	service, err := models.GetServiceById(serviceId, userName)
 	if err != nil {
 		beego.Error("获取service失败", err)
 		this.Data["json"] = models.NewErrorInfo("获取service失败")
 		this.ServeJSON()
 		return
 	}
-	this.Data["json"] = map[string]interface{}{"code":"0", "msg":"Success", "service":relation}
+	this.Data["json"] = map[string]interface{}{"code":"0", "msg":"Success", "service":service}
 	this.ServeJSON()
 }

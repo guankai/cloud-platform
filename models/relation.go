@@ -132,3 +132,13 @@ func GetUserServiceCount(userName string) (int, []ClRelation, error) {
 	}
 	return int(count), relation, nil
 }
+
+func GetServiceById(serviceId string, userName string) (*UserService, error) {
+	o := db.GetOrmer()
+	var userService UserService
+	err := o.Raw("select a.service_id,a.service_name,a.service_pic,a.request_path,a.api_id,a.provider,a.create_time,a.version,a.service_desc,a.upstream_url,ifnull(b.status,'0') status,ifnull(b.relation_id,'') relation_id,ifnull(b.consumer_id,'') consumer_id,ifnull(b.api_key_id,'') api_key_id,ifnull(b.api_key,'') api_key,c.type_name from cl_service a left join cl_relation b on a.service_id = b.service_id and b.user_name = ? left join cl_type c on a.type_id = c.type_id where a.service_id = ?", userName, serviceId).QueryRow(&userService)
+	if err != nil {
+		return nil, err
+	}
+	return &userService, nil
+}
